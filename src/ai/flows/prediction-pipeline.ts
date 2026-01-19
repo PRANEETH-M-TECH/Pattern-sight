@@ -32,12 +32,14 @@ const prompt = ai.definePrompt({
   name: 'predictionPipelinePrompt',
   input: {schema: PredictionInputSchema},
   output: {schema: PredictionOutputSchema},
-  prompt: `You are an expert stock market analyst. Based on the LSTM prediction of the stock trend and the CNN identified chart pattern, provide a summary of the analysis.
+  prompt: `You are an expert stock market analyst. Your goal is to provide a clear, concise, and insightful summary based on AI-driven predictions.
+Combine the LSTM trend prediction and the CNN chart pattern to create a holistic analysis summary.
+Explain how these two factors together influence the potential future movement of the stock.
 
-LSTM Prediction: {{{lstmPrediction}}}
-CNN Pattern: {{{cnnPattern}}}
+LSTM Prediction (Trend): {{{lstmPrediction}}}
+CNN Pattern (Market Structure): {{{cnnPattern}}}
 
-Analysis Summary: `,
+Provide your analysis summary below.`,
 });
 
 const predictionPipelineFlow = ai.defineFlow(

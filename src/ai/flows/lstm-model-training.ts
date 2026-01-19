@@ -32,11 +32,9 @@ const prompt = ai.definePrompt({
   name: 'lstmModelTrainingPrompt',
   input: {schema: LSTMModelTrainingInputSchema},
   output: {schema: LSTMModelTrainingOutputSchema},
-  prompt: `You are an AI model training expert specializing in time series analysis.
-
-You will train an LSTM model using the historical stock data provided, then predict the future price trend (up or down).
-
-Provide a model summary, including training accuracy, and the predicted trend based on the trained model.
+  prompt: `You are an expert in time series analysis using LSTM models.
+Based on the provided historical stock data, analyze it as if you were using an LSTM model and predict the future price trend (e.g., up, down, or sideways).
+Also, provide a brief summary of your analysis as if it were a model summary.
 
 Historical Data: {{{historicalData}}}
 `,

@@ -47,25 +47,17 @@ const classifyChartPatternFlow = ai.defineFlow(
     outputSchema: ChartPatternOutputSchema,
   },
   async input => {
-    try {
-      //Consider safety settings to allow broader classification results.
-      const {output} = await classifyChartPatternPrompt(input, {
-        config: {
-          safetySettings: [
-            {
-              category: 'HARM_CATEGORY_DANGEROUS_CONTENT',
-              threshold: 'BLOCK_NONE',
-            },
-          ],
-        },
-      });
-      return output!;
-    } catch (error) {
-      console.error('Error classifying chart pattern:', error);
-      return {
-        pattern: 'unknown',
-        confidence: 0.0,
-      };
-    }
+    //Consider safety settings to allow broader classification results.
+    const {output} = await classifyChartPatternPrompt(input, {
+      config: {
+        safetySettings: [
+          {
+            category: 'HARM_CATEGORY_DANGEROUS_CONTENT',
+            threshold: 'BLOCK_NONE',
+          },
+        ],
+      },
+    });
+    return output!;
   }
 );
