@@ -1,84 +1,61 @@
 'use client';
 
-import { useState } from 'react';
-import type { AnalysisResult } from '@/lib/types';
-import { getAnalysis } from '@/app/actions';
-import { useToast } from '@/hooks/use-toast';
-
-import { StockForm } from '@/components/patternsight/stock-form';
-import { ResultsDisplay } from '@/components/patternsight/results-display';
-import { Skeleton } from '@/components/ui/skeleton';
+import { useState, useEffect } from 'react';
+import { useSearchParams, useRouter } from 'next/navigation';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { OverviewTab } from './overview-tab';
+import { PortfolioTab } from './portfolio-tab';
+import { AnalyticsTab } from './analytics-tab';
+import { SettingsTab } from './settings-tab';
 
 export function Dashboard() {
-  const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null);
-  const [loading, setLoading] = useState(false);
-  const { toast } = useToast();
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const [activeTab, setActiveTab] = useState<string>('overview');
 
-  const handleAnalysis = async (ticker: string) => {
-    setLoading(true);
-    setAnalysisResult(null);
-    try {
-      const result = await getAnalysis(ticker);
-      setAnalysisResult(result);
-    } catch (error) {
-      console.error(error);
-      toast({
-        variant: 'destructive',
-        title: 'Analysis Failed',
-        description:
-          'Could not fetch or analyze stock data. Please try again.',
-      });
-    } finally {
-      setLoading(false);
+  useEffect(() => {
+    const tab = searchParams.get('tab') || 'overview';
+    if (['overview', 'portfolio', 'analytics', 'settings'].includes(tab)) {
+      setActiveTab(tab);
     }
+  }, [searchParams]);
+
+  const handleTabChange = (value: string) => {
+    setActiveTab(value);
+    router.push(`/dashboard?tab=${value}`);
+  };
+
+  const handleAddToPortfolio = (ticker: string) => {
+    handleTabChange('portfolio');
+  };
+
+  const handleSelectTicker = (ticker: string) => {
+    handleTabChange('overview');
   };
 
   return (
-    <main className="flex-1">
-      <div className="container py-8 md:py-12">
-        <section className="text-center max-w-3xl mx-auto">
-          <h1 className="text-3xl font-bold tracking-tight md:text-5xl lg:text-6xl font-headline">
-            AI-Powered Stock Pattern Analysis
-          </h1>
-          <p className="mt-4 text-lg text-muted-foreground md:text-xl">
-            Enter a stock ticker to unlock insights. Our AI models will detect
-            chart patterns, predict trends, and visualize key technical
-            indicators.
-          </p>
-        </section>
+    <main className="flex-1 overflow-y-auto">
+      <div className="container max-w-7xl mx-auto py-6 md:py-8 px-4 md:px-6">
+        <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
+          <TabsContent value="overview" className="mt-0 border-none p-0 outline-none">
+            <OverviewTab onAddToPortfolio={handleAddToPortfolio} />
+          </TabsContent>
 
-        <section className="mt-8 md:mt-12 max-w-md mx-auto">
-          <StockForm onSubmit={handleAnalysis} loading={loading} />
-        </section>
+          <TabsContent value="portfolio" className="mt-0 border-none p-0 outline-none">
+            <PortfolioTab onSelectTicker={handleSelectTicker} />
+          </TabsContent>
 
-        <section className="mt-8 md:mt-12">
-          {loading && <LoadingSkeleton />}
-          {analysisResult && <ResultsDisplay result={analysisResult} />}
-        </section>
+          <TabsContent value="analytics" className="mt-0 border-none p-0 outline-none">
+            <AnalyticsTab />
+          </TabsContent>
+
+          <TabsContent value="settings" className="mt-0 border-none p-0 outline-none">
+            <SettingsTab />
+          </TabsContent>
+        </Tabs>
       </div>
-      <footer className="py-6 md:px-8 md:py-0 border-t">
-        <div className="container flex flex-col items-center justify-between gap-4 md:h-24 md:flex-row">
-          <p className="text-sm text-center text-muted-foreground md:text-left">
-            Built with AI. Powered by Next.js.
-          </p>
-          <p className="text-sm text-center text-muted-foreground md:text-left">
-            Disclaimer: For educational purposes only. Not financial advice.
-          </p>
-        </div>
-      </footer>
+
+
     </main>
   );
 }
-
-const LoadingSkeleton = () => (
-    <div className="grid gap-6 lg:grid-cols-3">
-      <div className="lg:col-span-3 space-y-4">
-        <Skeleton className="h-[450px] w-full" />
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-          {[...Array(5)].map((_, i) => (
-            <Skeleton key={i} className="h-28 w-full" />
-          ))}
-        </div>
-      </div>
-    </div>
-  );

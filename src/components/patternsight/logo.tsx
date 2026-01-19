@@ -1,8 +1,13 @@
 import type { SVGProps } from 'react';
+import { cn } from '@/lib/utils';
 
-export function Logo(props: SVGProps<SVGSVGElement>) {
+export function Logo({ className, onClick, ...props }: SVGProps<SVGSVGElement> & { onClick?: () => void }) {
   return (
-    <div className="flex items-center gap-2" aria-label="PatternSight homepage">
+    <div
+      className={cn("flex items-center gap-2 select-none", onClick && "cursor-pointer active:scale-95 transition-transform", className)}
+      aria-label="PatternSight homepage"
+      onClick={onClick}
+    >
       <svg
         width="32"
         height="32"
